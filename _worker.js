@@ -135,6 +135,11 @@ export default {
 			}
 
 			if (url.pathname.toLowerCase().startsWith('/check')) {
+				const checkToken = env.CHECK_TOKEN;
+				if (!checkToken) return jsonResponse({ error: 'CHECK_TOKEN is not configured' }, { status: 503, origin });
+				if (request.headers.get('Authorization') !== `Bearer ${checkToken}`) {
+					return jsonResponse({ error: 'Unauthorized' }, { status: 401, origin });
+				}
 				let checkParams = null;
 				for (const type of PROXY_TYPES) {
 					if (url.searchParams.has(type)) {
